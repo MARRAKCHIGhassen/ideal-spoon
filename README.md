@@ -1,6 +1,6 @@
-# Phase-Aware Scattering Encoder-Decoder (ICML 2026 Submission)
+# Phase-Aware Scattering Encoder–Decoder: Decoupling Stability from Invariance for Dense Prediction (ICDM 2026 Submission)
 
-This repository contains the core implementation and experimental data for the "Phase-Aware Wavelet-Based-Scattering Encoder-Decoder" submission. The code is organized as a modular library to facilitate easy integration and reproducibility.
+This repository contains the core implementation and experimental data for the "Phase-Aware Scattering Encoder–Decoder: Decoupling Stability from Invariance for Dense Prediction" submission. The code is organized as a modular library to facilitate easy integration and reproducibility.
 
 ## Repository Structure
 
