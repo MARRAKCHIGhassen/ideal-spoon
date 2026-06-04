@@ -11,6 +11,7 @@ This repository contains the core implementation and experimental data for the "
 - `results/`: Raw and processed results organized by study, experiment, seed, and attempt, providing the evidence for the tables and figures in the main text.
 - `Preliminary-Segmentation-Study/`: Specific experimental scripts and implementations for the ISIC skin lesion segmentation tasks.
 - `constants.py`: Global constants and fixed parameters.
+- `Plots`: Plots defining
 
 ## Installation & Requirements
 
