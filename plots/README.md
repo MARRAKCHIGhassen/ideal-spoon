@@ -1,4 +1,4 @@
-# phase-aware-icml-26
+# Plots
 This repository contains the high-resolution supplementary visualizations requested during the rebuttal phase.
 
 ## Figure S1-S3: Full Architecture
