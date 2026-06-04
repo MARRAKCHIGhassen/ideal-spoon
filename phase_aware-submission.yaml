@@ -1,0 +1,1179 @@
+  # ====================>>>>> Phase 1: Baseline Comparison <<<<<====================
+  - name: "S1a_TEST_Denoising_Baseline"
+    description: "Standard U-Net baseline in denoising."
+    template:
+      pattern: "supervised_pattern_standard"
+      metrics:
+        restoration:
+          id: "restoration_metrics_standard"
+          params:
+            data_range: 1.0  # Assumes normalized [0,1] data
+            include_lpips: false # Recommended for SOTA comparison (S7a)
+        error:
+          id: "mae_standard"
+          params: {}
+      data:
+        main:
+          id: "denoising_bsd_standard"
+          type: "denoising_bsd_standard"
+          source: "BSD400/BSD68"
+          params:
+            color: "grayscale"
+            sigma: 25
+            crop_size: 128
+            subset_fraction: 1.0
+          splits: ["train", "val", "test"]
+      optimizer:
+        main:
+          id: "adam_standard" 
+          type: "adam_standard"
+          params: 
+            adam_lr: 1e-3
+            adam_betas: [0.9, 0.999]
+      loss: 
+        main: 
+          id: "l1_standard"
+          type: "l1_standard"
+          params: 
+            reduction: "mean"
+      phases:
+        train:
+          epochs: 200
+          batch_size: 16
+        val:
+          batch_size: 1
+        test:
+          batch_size: 1
+    grid:
+      models.main: [
+        {
+          id: dn_cnn,
+          label: "dn_cnn",
+          type: "dn_cnn",
+          params: {
+            in_channels: 1,
+            out_channels: 1,
+            depth: 17,
+            n_channels: 64,
+            bias: True,
+            weights: "external/dncnn/pretraind_ckpt/grayscale_sigma_25.pth",
+          }
+        },
+      ]
+
+  - name: "S1a_FINE_TUNE_Denoising_Baseline"
+    description: "Standard U-Net baseline in denoising."
+    template:
+      pattern: "supervised_pattern_standard"
+      metrics:
+        restoration:
+          id: "restoration_metrics_standard"
+          params:
+            data_range: 1.0  # Assumes normalized [0,1] data
+            include_lpips: false # Recommended for SOTA comparison (S7a)
+        error:
+          id: "mae_standard"
+          params: {}
+      data:
+        main:
+          id: "denoising_bsd_standard"
+          type: "denoising_bsd_standard"
+          source: "BSD400/BSD68"
+          params:
+            color: "grayscale"
+            sigma: 25
+            crop_size: 128
+            subset_fraction: 1.0
+          splits: ["train", "val", "test"]
+      optimizer:
+        main:
+          id: "adam_standard" 
+          type: "adam_standard"
+          params: 
+            adam_lr: 1e-3
+            adam_betas: [0.9, 0.999]
+      loss: 
+        main: 
+          id: "l1_standard"
+          type: "l1_standard"
+          params: 
+            reduction: "mean"
+      phases:
+        train:
+          epochs: 200
+          batch_size: 4
+        val:
+          batch_size: 1
+        test:
+          batch_size: 1
+    grid:
+      models.main: [
+        {
+          id: "swin_ir",
+          label: "swin_ir",
+          type: "swin_ir",
+          params: {
+            img_size: 128,
+            in_channels: 1,
+            weights: "external/swin_ir/model_zoo/004_grayDN_DFWB_s128w8_SwinIR-M_noise25.pth",
+          }
+        },
+      ]
+
+  - name: "S1c_Denoising_Wavelets_Baseline"
+    description: "Wavelet-Based Methods baseline in denoising."
+    template:
+      pattern: "supervised_pattern_standard"
+      metrics:
+        restoration:
+          id: "restoration_metrics_standard"
+          params:
+            data_range: 1.0  # Assumes normalized [0,1] data
+            include_lpips: false # Recommended for SOTA comparison (S7a)
+        error:
+          id: "mae_standard"
+          params: {}
+      data:
+        main:
+          id: "denoising_bsd_standard"
+          type: "denoising_bsd_standard"
+          source: "BSD400/BSD68"
+          params:
+            color: "grayscale"
+            sigma: 25
+            crop_size: 128
+            subset_fraction: 1.0
+          splits: ["train", "val", "test"]
+      optimizer:
+        main:
+          id: "adam_standard" 
+          type: "adam_standard"
+          params: 
+            adam_lr: 1e-4
+            adam_betas: [0.9, 0.999]
+      loss: 
+        main: 
+          id: "l1_standard"
+          type: "l1_standard"
+          params: 
+            reduction: "mean"
+      phases:
+        train:
+          epochs: 200
+          batch_size: 8
+        val:
+          batch_size: 1
+        test:
+          batch_size: 1
+    grid:
+      models.main: [
+        {
+          id: "dswn",
+          label: "dswn",
+          type: "dswn",
+          params: {}
+        },
+      ]
+
+  # ====================>>>>> Phase 2: Internal Ablation <<<<<====================
+  - name: "S2a_Denoising_Scattering_Internal_Ablation"
+    description: "Evaluate scattering variants on Denoising tasks."
+    template:
+      pattern: "supervised_pattern_standard"
+      metrics:
+        restoration:
+          id: "restoration_metrics_standard"
+          params:
+            data_range: 1.0  # Assumes normalized [0,1] data
+            include_lpips: false # Recommended for SOTA comparison (S7a)
+        error:
+          id: "mae_standard"
+          params: {}
+        physics:
+          id: "scattering_metrics_standard"
+          params:
+            include_frame_error: true
+      data:
+        main:
+          id: "denoising_bsd_standard"
+          type: "denoising_bsd_standard"
+          source: "BSD400/BSD68"
+          params:
+            color: "grayscale"
+            sigma: 25
+            crop_size: 128
+            subset_fraction: 1.0
+          splits: ["train", "val", "test"]
+      optimizer:
+        main:
+          id: "adam_standard" 
+          type: "adam_standard"
+          params: 
+            adam_betas: [0.9, 0.999]
+      models:
+        main: {}
+      loss: 
+        main: 
+          id: "l1_standard"
+          type: "l1_standard"
+          params: 
+            reduction: "mean"
+      phases:
+        train:
+          epochs: 200
+          batch_size: 16
+        val:
+          batch_size: 1
+        test:
+          batch_size: 1
+    grid:
+      models.main: [
+        {
+          id: canonical_invariant_scattering_u_net,
+          label: "M2-Inv",
+          type: "canonical_invariant_scattering_u_net",
+          params:{
+            # -- Main target Parameters --
+            J: 3,
+            L: 8,
+            slant: 5e-1,
+            gate_hidden_channels: 16,
+            base_channels: 32,
+            # -- Data and splits dependent Parameters --
+            M: 128,
+            N: 128,
+            in_channels: 1,
+            out_channels: 1,
+            interpolation: "nearest",
+            # -- Variant defintion Parameters --
+            smoothing_mode: "standard",
+            skip_type: "modulus",
+            skip_subsample_scale_dependent: false,
+            shuffle_mode: null,
+            # -- Loading Parameters --
+            scattering_implementation: "vectorized",
+            warmup: true,
+            # -- Other Parameters --
+            eps: 3,
+            modulus_subsampling: false,
+          }
+        },
+        {
+          id: canonical_scattering_inspired_dense_u_net,
+          label: "M2-Dense",
+          type: "canonical_scattering_inspired_dense_u_net",
+          params:{
+            # -- Main target Parameters --
+            J: 3,
+            L: 8,
+            slant: 5e-1,
+            gate_hidden_channels: 16,
+            base_channels: 32,
+            # -- Data and splits dependent Parameters --
+            M: 128,
+            N: 128,
+            in_channels: 1,
+            out_channels: 1,
+            interpolation: "nearest",
+            # -- Variant defintion Parameters --
+            smoothing_mode: "scaled",
+            skip_type: "modulus",
+            skip_subsample_scale_dependent: false,
+            shuffle_mode: null,
+            # -- Loading Parameters --
+            scattering_implementation: "vectorized",
+            warmup: true,
+          }
+        },
+        {
+          id: canonical_invariant_scattering_subsampled_u_net,
+          label: "M3-M4-Inv",
+          type: "canonical_invariant_scattering_subsampled_u_net",
+          params:{
+            # -- Main target Parameters --
+            J: 3,
+            L: 8,
+            slant: 5e-1,
+            gate_hidden_channels: 16,
+            base_channels: 32,
+            # -- Data and splits dependent Parameters --
+            M: 128,
+            N: 128,
+            in_channels: 1,
+            out_channels: 1,
+            interpolation: "nearest",
+            # -- Variant defintion Parameters --
+            smoothing_mode: "standard",
+            skip_type: "modulus",
+            skip_subsample_scale_dependent: true,
+            shuffle_mode: null,
+            # -- Loading Parameters --
+            scattering_implementation: "monolithic",
+          }
+        },
+        {
+          id: canonical_scattering_inspired_dense_subsampled_u_net,
+          label: "M3-M4-Dense",
+          type: "canonical_scattering_inspired_dense_subsampled_u_net",
+          params:{
+            # -- Main target Parameters --
+            J: 3,
+            L: 8,
+            slant: 5e-1,
+            gate_hidden_channels: 16,
+            base_channels: 32,
+            # -- Data and splits dependent Parameters --
+            M: 128,
+            N: 128,
+            in_channels: 1,
+            out_channels: 1,
+            interpolation: "nearest",
+            # -- Variant defintion Parameters --
+            smoothing_mode: "scaled",
+            skip_type: "modulus",
+            skip_subsample_scale_dependent: true,
+            shuffle_mode: null,
+            # -- Loading Parameters --
+            scattering_implementation: "monolithic",
+          }
+        },
+        {
+          id: invariant_scattering_complex_skips_u_net,
+          label: "M5-Inv",
+          type: "invariant_scattering_complex_skips_u_net",
+          params:{
+            # -- Main target Parameters --
+            J: 3,
+            L: 8,
+            slant: 5e-1,
+            gate_hidden_channels: 16,
+            base_channels: 32,
+            # -- Data and splits dependent Parameters --
+            M: 128,
+            N: 128,
+            in_channels: 1,
+            out_channels: 1,
+            interpolation: "nearest",
+            # -- Variant defintion Parameters --
+            smoothing_mode: "standard",
+            skip_type: "raw",
+            skip_subsample_scale_dependent: false,
+            shuffle_mode: null,
+            # -- Loading Parameters --
+            scattering_implementation: "vectorized",
+          }
+        },
+        {
+          id: scattering_inspired_dense_complex_skips_u_net,
+          label: "M5-Dense",
+          type: "scattering_inspired_dense_complex_skips_u_net",
+          params:{
+            # -- Main target Parameters --
+            J: 3,
+            L: 8,
+            slant: 5e-1,
+            gate_hidden_channels: 16,
+            base_channels: 32,
+            # -- Data and splits dependent Parameters --
+            M: 128,
+            N: 128,
+            in_channels: 1,
+            out_channels: 1,
+            interpolation: "nearest",
+            # -- Variant defintion Parameters --
+            smoothing_mode: "scaled",
+            skip_type: "raw",
+            skip_subsample_scale_dependent: false,
+            shuffle_mode: null,
+            # -- Loading Parameters --
+            scattering_implementation: "vectorized",
+          }
+        },
+        {
+          id: invariant_scattering_phase_skips_u_net,
+          label: "M6-Inv-Phase",
+          type: "invariant_scattering_phase_skips_u_net",
+          params:{
+            # -- Main target Parameters --
+            J: 3,
+            L: 8,
+            slant: 5e-1,
+            gate_hidden_channels: 16,
+            base_channels: 32,
+            # -- Data and splits dependent Parameters --
+            M: 128,
+            N: 128,
+            in_channels: 1,
+            out_channels: 1,
+            interpolation: "nearest",
+            # -- Variant defintion Parameters --
+            smoothing_mode: "standard",
+            skip_type: "polar",
+            skip_subsample_scale_dependent: false,
+            shuffle_mode: null,
+            # -- Loading Parameters --
+            scattering_implementation: "vectorized",
+          }
+        },
+        {
+          id: invariant_scattering_pyramidal_phase_skips_u_net,
+          label: "M6-Inv-Pyramidal",
+          type: "invariant_scattering_pyramidal_phase_skips_u_net",
+          params:{
+            # -- Main target Parameters --
+            J: 3,
+            L: 8,
+            slant: 5e-1,
+            gate_hidden_channels: 16,
+            base_channels: 32,
+            # -- Data and splits dependent Parameters --
+            M: 128,
+            N: 128,
+            in_channels: 1,
+            out_channels: 1,
+            interpolation: "nearest",
+            # -- Variant defintion Parameters --
+            smoothing_mode: "standard",
+            skip_type: "polar",
+            skip_subsample_scale_dependent: true,
+            shuffle_mode: null,
+            # -- Loading Parameters --
+            scattering_implementation: "monolithic",
+          }
+        },
+        {
+          id: phase_aware_u_net_standard,
+          label: "M6",
+          type: "phase_aware_u_net_standard",
+          params:{
+            # -- Main target Parameters --
+            J: 3,
+            L: 8,
+            slant: 5e-1,
+            gate_hidden_channels: 16,
+            base_channels: 32,
+            # -- Data and splits dependent Parameters --
+            M: 128,
+            N: 128,
+            in_channels: 1,
+            out_channels: 1,
+            interpolation: "nearest",
+            # -- Variant defintion Parameters --
+            smoothing_mode: "scaled",
+            skip_type: "polar",
+            skip_subsample_scale_dependent: false,
+            shuffle_mode: null,
+            # -- Loading Parameters --
+            scattering_implementation: "vectorized",
+          }
+        },
+      ]
+      optimizer.main.params.adam_lr: [1.0e-3, 5.0e-4]
+
+  # ====================>>>>> Phase 3: Structure Shuffling <<<<<====================
+  - name: "S3a_Denoising_Structure_Shuffling"
+    description: "Verify performance comes from the structure of the phase, not just parameter count, in denoising case."
+    template:
+      pattern: "supervised_pattern_standard"
+      metrics:
+        restoration:
+          id: "restoration_metrics_standard"
+          params:
+            data_range: 1.0  # Assumes normalized [0,1] data
+            include_lpips: false # Recommended for SOTA comparison (S7a)
+        error:
+          id: "mae_standard"
+          params: {}
+        physics:
+          id: "scattering_metrics_standard"
+          params:
+            include_frame_error: false
+      data:
+        main:
+          id: "denoising_bsd_standard"
+          type: "denoising_bsd_standard"
+          source: "BSD400/BSD68"
+          params:
+            color: "grayscale"
+            sigma: 25
+            crop_size: 128
+            subset_fraction: 1.0
+          splits: ["train", "val", "test"]
+      optimizer:
+        main:
+          id: "adam_standard" 
+          type: "adam_standard"
+          params: 
+            adam_lr: 1e-3
+            adam_betas: [0.9, 0.999]
+      models:
+        main: {}
+      loss: 
+        main: 
+          id: "l1_standard"
+          type: "l1_standard"
+          params: 
+            reduction: "mean"
+      phases:
+        train:
+          epochs: 200
+          batch_size: 16
+        val:
+          batch_size: 1
+        test:
+          batch_size: 1
+    grid:
+      models.main: [
+        {
+          id: "phase_aware_u_net_standard",
+          label: "M6",
+          type: "phase_aware_u_net_standard",
+          params: {
+            # -- Main target Parameters --
+            J: 3,
+            L: 4,
+            slant: 5e-1,
+            gate_hidden_channels: 16,
+            base_channels: 32,
+            # -- Data and splits dependent Parameters --
+            M: 128,
+            N: 128,
+            in_channels: 1,
+            out_channels: 1,
+            interpolation: "nearest",
+            # -- Variant defintion Parameters --
+            smoothing_mode: "scaled",
+            skip_type: "polar",
+            skip_subsample_scale_dependent: false,
+            shuffle_mode: null,
+            # -- Loading Parameters --
+            scattering_implementation: "vectorized",
+            warmup: true,
+          }
+        },
+        {
+          id: "phase_aware_u_net_shuffle_all",
+          label: "M7a",
+          type: "phase_aware_u_net_shuffle_all",
+          params: {
+            # -- Main target Parameters --
+            J: 3,
+            L: 4,
+            slant: 5e-1,
+            gate_hidden_channels: 16,
+            base_channels: 32,
+            # -- Data and splits dependent Parameters --
+            M: 128,
+            N: 128,
+            in_channels: 1,
+            out_channels: 1,
+            interpolation: "nearest",
+            # -- Variant defintion Parameters --
+            smoothing_mode: "scaled",
+            skip_type: "polar",
+            skip_subsample_scale_dependent: false,
+            shuffle_mode: "all",
+            # -- Loading Parameters --
+            scattering_implementation: "vectorized",
+            warmup: true,
+          }
+        },
+        {
+          id: "phase_aware_u_net_shuffle_phase",
+          label: "M7b",
+          type: "phase_aware_u_net_shuffle_phase",
+          params: {
+            # -- Main target Parameters --
+            J: 3,
+            L: 4,
+            slant: 5e-1,
+            gate_hidden_channels: 16,
+            base_channels: 32,
+            # -- Data and splits dependent Parameters --
+            M: 128,
+            N: 128,
+            in_channels: 1,
+            out_channels: 1,
+            interpolation: "nearest",
+            # -- Variant defintion Parameters --
+            smoothing_mode: "scaled",
+            skip_type: "polar",
+            skip_subsample_scale_dependent: false,
+            shuffle_mode: "phase",
+            # -- Loading Parameters --
+            scattering_implementation: "vectorized",
+            warmup: true,
+          }
+        },
+        {
+          id: "phase_aware_u_net_shuffle_amplitude",
+          label: "M7c",
+          type: "phase_aware_u_net_shuffle_amplitude",
+          params: {
+            # -- Main target Parameters --
+            J: 3,
+            L: 4,
+            slant: 5e-1,
+            gate_hidden_channels: 16,
+            base_channels: 32,
+            # -- Data and splits dependent Parameters --
+            M: 128,
+            N: 128,
+            in_channels: 1,
+            out_channels: 1,
+            interpolation: "nearest",
+            # -- Variant defintion Parameters --
+            smoothing_mode: "scaled",
+            skip_type: "polar",
+            skip_subsample_scale_dependent: false,
+            shuffle_mode: "amplitude",
+            # -- Loading Parameters --
+            scattering_implementation: "vectorized",
+            warmup: true,
+          }
+        },
+      ]
+
+  # ====================>>>>> Phase 4: Phase Regularization <<<<<====================
+  - name: "S4a_Denoising_Phase_Regularization"
+    description: "Measure impact of enforcing explicit phase alignment, in denoising."
+    template:
+      pattern: "supervised_pattern_standard"
+      metrics:
+        restoration:
+          id: "restoration_metrics_standard"
+          params:
+            data_range: 1.0  # Assumes normalized [0,1] data
+            include_lpips: false # Recommended for SOTA comparison (S7a)
+        error:
+          id: "mae_standard"
+          params: {}
+        physics:
+          id: "scattering_metrics_standard"
+          params:
+            include_frame_error: false
+      data:
+        main:
+          id: "denoising_bsd_standard"
+          type: "denoising_bsd_standard"
+          source: "BSD400/BSD68"
+          params:
+            color: "grayscale"
+            sigma: 25
+            crop_size: 128
+            subset_fraction: 1.0
+          splits: ["train", "val", "test"]
+      models: 
+        main:
+          id: "phase_aware_u_net_standard"
+          label: "M6"
+          type: "phase_aware_u_net_standard"
+          params: 
+            # -- Main target Parameters --
+            J: 3
+            L: 8
+            slant: 5e-1
+            gate_hidden_channels: 16
+            base_channels: 32
+            # -- Data and splits dependent Parameters --
+            M: 128
+            N: 128
+            in_channels: 1
+            out_channels: 1
+            interpolation: "nearest"
+            # -- Variant defintion Parameters --
+            smoothing_mode: "scaled"
+            skip_type: "polar"
+            skip_subsample_scale_dependent: false
+            shuffle_mode: null
+            # -- Loading Parameters --
+            scattering_implementation: "vectorized"
+            warmup: true
+      loss: 
+        main: 
+          id: "l1_phase_standard" 
+          type: "l1_phase_standard"
+          params: 
+            l1_reduction: "mean"
+      optimizer:
+        main:
+          id: "adam_standard" 
+          type: "adam_standard"
+          params: 
+            adam_lr: 1e-3
+            adam_betas: [0.9, 0.999]
+      phases:
+        train:
+          epochs: 200
+          batch_size: 16
+        val:
+          batch_size: 1
+        test:
+          batch_size: 1
+    grid:
+      loss.main.params.lambda_phase_tv: [0, 1.0e-2, 2.5e-1]
+      loss.main.params.lambda_phase_align: [0, 5.0e-2, 2.5e-1]
+
+  # ====================>>>>> Phase 5: Sensitivity Analysis <<<<<====================
+  - name: "S5a_D_Denoising_Scale_Sensitivity"
+    description: "Analyze dependence on the scattering scale parameter J, in denoising context"
+    template:
+      pattern: "supervised_pattern_standard"
+      metrics:
+        restoration:
+          id: "restoration_metrics_standard"
+          params:
+            data_range: 1.0  # Assumes normalized [0,1] data
+            include_lpips: false # Recommended for SOTA comparison (S7a)
+        error:
+          id: "mae_standard"
+          params: {}
+      data:
+        main:
+          id: "denoising_bsd_standard"
+          type: "denoising_bsd_standard"
+          source: "BSD400/BSD68"
+          params:
+            color: "grayscale"
+            sigma: 25
+            crop_size: 128
+            subset_fraction: 1.0
+          splits: ["train", "val", "test"]
+      optimizer:
+        main:
+          id: "adam_standard" 
+          type: "adam_standard"
+          params: 
+            adam_lr: 1e-3
+            adam_betas: [0.9, 0.999]
+      models: 
+        main:
+          id: "phase_aware_u_net_standard"
+          label: "M6"
+          type: "phase_aware_u_net_standard"
+          params:
+            # -- Main target Parameters --
+            L: 8
+            slant: 5e-1
+            gate_hidden_channels: 16
+            base_channels: 32
+            # -- Data and splits dependent Parameters --
+            M: 128
+            N: 128
+            in_channels: 1
+            out_channels: 1
+            interpolation: "nearest"
+            # -- Variant defintion Parameters --
+            smoothing_mode: "scaled"
+            skip_type: "polar"
+            skip_subsample_scale_dependent: false
+            shuffle_mode: null
+            # -- Loading Parameters --
+            scattering_implementation: "vectorized"
+            warmup: true
+      loss: 
+        main: 
+          id: "l1_standard"
+          type: "l1_standard"
+          params: 
+            reduction: "mean"
+      phases:
+        train:
+          epochs: 200
+          batch_size: 16
+        val:
+          batch_size: 1
+        test:
+          batch_size: 1
+    grid:
+      models.main.params.J: [2, 3, 4]
+      # optimizer.main.params.adam_lr: [1.0e-3, 5.0e-4]
+
+  - name: "S5b_D_Denoising_Orientation_Sensitivity"
+    description: "Analyze dependence on the scattering orientation parameter L, in denoising case"
+    template:
+      pattern: "supervised_pattern_standard"
+      metrics:
+        restoration:
+          id: "restoration_metrics_standard"
+          params:
+            data_range: 1.0  # Assumes normalized [0,1] data
+            include_lpips: false # Recommended for SOTA comparison (S7a)
+        error:
+          id: "mae_standard"
+          params: {}
+      data:
+        main:
+          id: "denoising_bsd_standard"
+          type: "denoising_bsd_standard"
+          source: "BSD400/BSD68"
+          params:
+            color: "grayscale"
+            sigma: 25
+            crop_size: 128
+            subset_fraction: 1.0
+          splits: ["train", "val", "test"]
+      optimizer:
+        main:
+          id: "adam_standard" 
+          type: "adam_standard"
+          params: 
+            adam_lr: 1e-3
+            adam_betas: [0.9, 0.999]
+      models:
+        main:
+          id: "phase_aware_u_net_standard"
+          label: "M6"
+          type: "phase_aware_u_net_standard"
+          params:
+            # -- Main target Parameters --
+            J: 3
+            slant: 5e-1
+            gate_hidden_channels: 16
+            base_channels: 32
+            # -- Data and splits dependent Parameters --
+            M: 128
+            N: 128
+            in_channels: 1
+            out_channels: 1
+            interpolation: "nearest"
+            # -- Variant defintion Parameters --
+            smoothing_mode: "scaled"
+            skip_type: "polar"
+            skip_subsample_scale_dependent: false
+            shuffle_mode: null
+            # -- Loading Parameters --
+            scattering_implementation: "vectorized"
+            warmup: true
+      loss: 
+        main: 
+          id: "l1_standard"
+          type: "l1_standard"
+          params: 
+            reduction: "mean"
+      phases:
+        train:
+          epochs: 200
+          batch_size: 16
+        val:
+          batch_size: 1
+        test:
+          batch_size: 1
+    grid:
+      models.main.params.L: [4, 8, 16]
+      # optimizer.main.params.adam_lr: [1.0e-3, 5.0e-4]
+
+  - name: "S5c_D_Denoising_Slant_Sensitivity"
+    description: "Analyze dependence on the scattering slant parameter, in denoising"
+    template:
+      pattern: "supervised_pattern_standard"
+      metrics:
+        restoration:
+          id: "restoration_metrics_standard"
+          params:
+            data_range: 1.0  # Assumes normalized [0,1] data
+            include_lpips: false # Recommended for SOTA comparison (S7a)
+        error:
+          id: "mae_standard"
+          params: {}
+      data:
+        main:
+          id: "denoising_bsd_standard"
+          type: "denoising_bsd_standard"
+          source: "BSD400/BSD68"
+          params:
+            color: "grayscale"
+            sigma: 25
+            crop_size: 128
+            subset_fraction: 1.0
+          splits: ["train", "val", "test"]
+      optimizer:
+        main:
+          id: "adam_standard" 
+          type: "adam_standard"
+          params: 
+            adam_lr: 1e-3
+            adam_betas: [0.9, 0.999]
+      models:
+        main:
+          id: "phase_aware_u_net_standard"
+          label: "M6"
+          type: "phase_aware_u_net_standard"
+          params:
+            # -- Main target Parameters --
+            J: 3
+            L: 8
+            gate_hidden_channels: 16
+            base_channels: 32
+            # -- Data and splits dependent Parameters --
+            M: 128
+            N: 128
+            in_channels: 1
+            out_channels: 1
+            interpolation: "nearest"
+            # -- Variant defintion Parameters --
+            smoothing_mode: "scaled"
+            skip_type: "polar"
+            skip_subsample_scale_dependent: false
+            shuffle_mode: null
+            # -- Loading Parameters --
+            scattering_implementation: "vectorized"
+            warmup: true
+      loss: 
+        main: 
+          id: "l1_standard"
+          type: "l1_standard"
+          params: 
+            reduction: "mean"
+      phases:
+        train:
+          epochs: 200
+          batch_size: 16
+        val:
+          batch_size: 1
+        test:
+          batch_size: 1
+    grid:
+      models.main.params.slant: [0.0, 0.5, 1.0]
+      # optimizer.main.params.adam_lr: [1.0e-3, 5.0e-4]
+
+  - name: "S5d_D_Denoising_Capacity_Sensitivity"
+    description: "Fairness check against U-Net (Parameter/FLOPs parity), in denoising case."
+    template:
+      pattern: "supervised_pattern_standard"
+      metrics:
+        restoration:
+          id: "restoration_metrics_standard"
+          params:
+            data_range: 1.0  # Assumes normalized [0,1] data
+            include_lpips: false # Recommended for SOTA comparison (S7a)
+        error:
+          id: "mae_standard"
+          params: {}
+      data:
+        main:
+          id: "denoising_bsd_standard"
+          type: "denoising_bsd_standard"
+          source: "BSD400/BSD68"
+          params:
+            color: "grayscale"
+            sigma: 25
+            crop_size: 128
+            subset_fraction: 1.0
+          splits: ["train", "val", "test"]
+      optimizer:
+        main:
+          id: "adam_standard" 
+          type: "adam_standard"
+          params: 
+            adam_lr: 1e-3
+            adam_betas: [0.9, 0.999]
+      models:
+        main:
+          id: "phase_aware_u_net_standard"
+          label: "M6"
+          type: "phase_aware_u_net_standard"
+          params:
+            # -- Main target Parameters --
+            J: 3
+            L: 8
+            slant: 5e-1
+            gate_hidden_channels: 16
+            # -- Data and splits dependent Parameters --
+            M: 128
+            N: 128
+            in_channels: 1
+            out_channels: 1
+            interpolation: "nearest"
+            # -- Variant defintion Parameters --
+            smoothing_mode: "scaled"
+            skip_type: "polar"
+            skip_subsample_scale_dependent: false
+            shuffle_mode: null
+            # -- Loading Parameters --
+            scattering_implementation: "vectorized"
+            warmup: true
+      loss: 
+        main: 
+          id: "l1_standard"
+          type: "l1_standard"
+          params: 
+            reduction: "mean"
+      phases:
+        train:
+          epochs: 200
+          batch_size: 16
+        val:
+          batch_size: 1
+        test:
+          batch_size: 1
+    grid:
+      models.main.params.base_channels: [32, 64, 128]
+      # optimizer.main.params.adam_lr: [1.0e-3, 5.0e-4]
+
+  - name: "S5e_D_Denoising_Gating_Sensitivity"
+    description: "Analyze the Phase Gating mechanism, in denoising case."
+    template:
+      pattern: "supervised_pattern_standard"
+      metrics:
+        restoration:
+          id: "restoration_metrics_standard"
+          params:
+            data_range: 1.0  # Assumes normalized [0,1] data
+            include_lpips: false # Recommended for SOTA comparison (S7a)
+        error:
+          id: "mae_standard"
+          params: {}
+        physics:
+          id: "scattering_metrics_standard"
+          params:
+            include_frame_error: false
+      data:
+        main:
+          id: "denoising_bsd_standard"
+          type: "denoising_bsd_standard"
+          source: "BSD400/BSD68"
+          params:
+            color: "grayscale"
+            sigma: 25
+            crop_size: 128
+            subset_fraction: 1.0
+          splits: ["train", "val", "test"]
+      optimizer:
+        main:
+          id: "adam_standard" 
+          type: "adam_standard"
+          params: 
+            adam_lr: 1e-3
+            adam_betas: [0.9, 0.999]
+      models:
+        main:
+          id: "phase_aware_u_net_standard"
+          label: "M6"
+          type: "phase_aware_u_net_standard"
+          params:
+            # -- Main target Parameters --
+            J: 3
+            L: 8
+            slant: 5e-1
+            base_channels: 32
+            # -- Data and splits dependent Parameters --
+            M: 128
+            N: 128
+            in_channels: 1
+            out_channels: 1
+            interpolation: "nearest"
+            # -- Variant defintion Parameters --
+            smoothing_mode: "scaled"
+            skip_type: "polar"
+            skip_subsample_scale_dependent: false
+            shuffle_mode: null
+            # -- Loading Parameters --
+            scattering_implementation: "vectorized"
+            warmup: true
+      loss: 
+        main: 
+          id: "l1_standard"
+          type: "l1_standard"
+          params: 
+            reduction: "mean"
+      phases:
+        train:
+          epochs: 200
+          batch_size: 16
+        val:
+          batch_size: 1
+        test:
+          batch_size: 1
+    grid:
+      models.main.params.gate_hidden_channels: [16, 32, 64]
+      # optimizer.main.params.adam_lr: [1.0e-3, 5.0e-4]
+
+  - name: "S6a_Denoising_Data_Efficiency"
+    description: "Prove Inductive Bias benefit in low-data regimes for denoising."
+    template:
+      pattern: "supervised_pattern_standard"
+      metrics:
+        restoration:
+          id: "restoration_metrics_standard"
+          params:
+            data_range: 1.0  # Assumes normalized [0,1] data
+            include_lpips: false # Recommended for SOTA comparison (S7a)
+        error:
+          id: "mae_standard"
+          params: {}
+      data:
+        main:
+          id: "denoising_bsd_standard"
+          type: "denoising_bsd_standard"
+          source: "BSD400/BSD68"
+          params:
+            color: "grayscale"
+            sigma: 25
+            crop_size: 128
+            subset_fraction: 1.0
+          splits: ["train", "val", "test"]
+      optimizer:
+        main:
+          id: "adam_standard" 
+          type: "adam_standard"
+          params: 
+            adam_lr: 1e-3
+            adam_betas: [0.9, 0.999]
+      loss: 
+        main: 
+          id: "l1_standard"
+          type: "l1_standard"
+          params: 
+            reduction: "mean"
+      phases:
+        train:
+          epochs: 200
+          batch_size: 16
+        val:
+          batch_size: 1
+        test:
+          batch_size: 1
+    grid:
+      models.main: [
+        {
+          id: dn_cnn,
+          label: "dn_cnn",
+          type: "dn_cnn",
+          params: {
+            in_channels: 1,
+            out_channels: 1,
+            depth: 17,
+            n_channels: 64,
+            bias: True,
+            weights: "external/dncnn/pretraind_ckpt/grayscale_sigma_25.pth",
+          }
+        },
+        {
+          id: "phase_aware_u_net_standard",
+          label: "M6",
+          type: "phase_aware_u_net_standard",
+          params: {
+            # -- Main target Parameters --
+            J: 3,
+            L: 8,
+            slant: 5e-1,
+            gate_hidden_channels: 16,
+            base_channels: 32,
+            # -- Data and splits dependent Parameters --
+            M: 128,
+            N: 128,
+            in_channels: 1,
+            out_channels: 1,
+            interpolation: "nearest",
+            # -- Variant defintion Parameters --
+            skip_type: "polar",
+            subsample_scale_dependent: true,
+            shuffle_mode: null,
+            # -- Loading Parameters --
+            scattering_implementation: "vectorized",
+            warmup: true,
+          }
+        },
+      ]
+      data.main.params.subset_fraction: [0.1, 0.25, 0.5, 1.0]
