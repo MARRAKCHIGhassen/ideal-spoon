@@ -1,0 +1,15 @@
+{
+    "loss": 0.04069858753236069,
+    "error": 0.040698595345020294,
+    "anisotropy": 1.6116011142730713,
+    "energy_decay": 0.07006728649139404,
+    "energy_preservation": 0.01445456501096487,
+    "frame_error_global": 0.9360344409942627,
+    "frame_error_local_coverage": 0.07813925296068192,
+    "frame_error_local_excess": -0.2917136549949646,
+    "frame_error_local_mse": 0.869770348072052,
+    "frame_error_local_var": 0.5226516723632812,
+    "sparsity_hoyer": 0.8608778715133667,
+    "psnr": 24.43436050415039,
+    "ssim": 0.7220290303230286
+}
