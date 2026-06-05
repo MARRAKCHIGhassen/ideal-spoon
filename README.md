@@ -11,7 +11,7 @@ This repository contains the core implementation and experimental data for the "
 - `results/`: Raw and processed results organized by study, experiment, seed, and attempt, providing the evidence for the tables and figures in the main text.
 - `Preliminary-Segmentation-Study/`: Specific experimental scripts and implementations for the ISIC skin lesion segmentation tasks.
 - `constants.py`: Global constants and fixed parameters.
-- `Plots`: Plots defining
+- `Plots`: Additional plots (not reported in the paper)
 - `ckpts`: The main checkpoint of Denoising M6 named as `M6-J_3-L_8.pth`
 
 ## Installation & Requirements
@@ -98,6 +98,6 @@ bsd_dataset = BSDDataset(**bsd_CONFIG)
 # ====== Usage ======
 # # Example
 outputs = model(next(iter(bsd_dataset)))
-usable_predictions = outputs["pred"]
+img = outputs["pred"]
 plt.imshow(img, cmap='gray', interpolation='nearest')
 plt.show()
